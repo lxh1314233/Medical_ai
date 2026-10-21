@@ -1,0 +1,92 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/medical_ai?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: hui1230.
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password:
+      database: 0
+      timeout: 3000ms
+  # 建表脚本手动执行 db/schema.sql，不在启动时自动重建
+  sql:
+    init:
+      mode: never
+  # 报告图片/PDF 上传（默认 1MB，需放大到 10MB）
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    # 开发期打印 SQL，生产关闭
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    banner: false
+    db-config:
+      id-type: auto
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+logging:
+  level:
+    com.xianhuicode: debug
+
+jwt:
+  # HMAC-SHA256 要求密钥 >= 32 字节
+  secret: ${JWT_SECRET:MedicalAiDevSecretKey_ChangeMe_2026_0123456789}
+  access-token-expire-ms: 7200000
+  refresh-token-expire-ms: 604800000
+
+app:
+  crypto:
+    # AES 密钥，长度必须为 16/24/32 字节
+    key: ${CRYPTO_KEY:MedicalAiKey1234}
+
+llm:
+  # mock | openai。openai 走 OpenAI 兼容协议的真实大模型（默认通义千问 DashScope）
+  provider: ${LLM_PROVIDER:openai}
+  # 优先 LLM_API_KEY，否则复用 DASHSCOPE_API_KEY（与 embedding/OCR 同一份密钥）
+  api-key: ${LLM_API_KEY:${DASHSCOPE_API_KEY:}}
+  base-url: ${LLM_BASE_URL:https://dashscope.aliyuncs.com/compatible-mode/v1}
+  model-name: ${LLM_MODEL:qwen-plus}
+  temperature: 0.7
+  timeout-ms: 60000
+
+embedding:
+  # 阿里云 DashScope 向量化（OpenAI 兼容端点）
+  api-key: ${DASHSCOPE_API_KEY:}
+  base-url: ${EMBEDDING_BASE_URL:https://dashscope.aliyuncs.com/compatible-mode/v1}
+  model-name: ${EMBEDDING_MODEL:text-embedding-v3}
+  # 向量维度，必须与 Pinecone index 建库维度一致（text-embedding-v3 默认 1024）
+  dimension: ${EMBEDDING_DIMENSION:1024}
+  timeout-ms: 60000
+
+vector:
+  # pinecone | memory。pinecone 走真实向量库（需 PINECONE_* 环境变量）；memory 走本地内存实现
+  store: ${VECTOR_STORE:pinecone}
+  # 启动时是否自动全量重建索引（一般关闭，走 POST /api/knowledge/reindex）
+  auto-index: ${VECTOR_AUTO_INDEX:false}
+  pinecone:
+    api-key: ${PINECONE_API_KEY:}
+    index-host: ${PINECONE_INDEX_HOST:}
+    namespace: ${PINECONE_NAMESPACE:medicalai}
+
+ocr:
+  # mock | dashscope。mock 无外部依赖即可跑通链路；dashscope 走 Qwen-VL 视觉识别
+  provider: ${OCR_PROVIDER:mock}
+  api-key: ${DASHSCOPE_API_KEY:}
+  base-url: ${OCR_BASE_URL:https://dashscope.aliyuncs.com/compatible-mode/v1}
+  model: ${OCR_MODEL:qwen-vl-plus}
+  timeout-ms: 60000
+
+storage:
+  # local | oss。local 存本地 uploads 目录；oss 接口预留
+  type: ${STORAGE_TYPE:local}
+  local-dir: ${STORAGE_LOCAL_DIR:uploads}

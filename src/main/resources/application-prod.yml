@@ -1,0 +1,76 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT:3306}/${DB_NAME}?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=true
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD}
+      database: ${REDIS_DATABASE:0}
+  sql:
+    init:
+      mode: never
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:
+    banner: false
+    db-config:
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+logging:
+  level:
+    root: info
+
+jwt:
+  secret: ${JWT_SECRET}
+  access-token-expire-ms: ${JWT_ACCESS_EXPIRE_MS:7200000}
+  refresh-token-expire-ms: ${JWT_REFRESH_EXPIRE_MS:604800000}
+
+app:
+  crypto:
+    key: ${CRYPTO_KEY}
+
+llm:
+  provider: ${LLM_PROVIDER:openai}
+  api-key: ${LLM_API_KEY:${DASHSCOPE_API_KEY:}}
+  base-url: ${LLM_BASE_URL:https://dashscope.aliyuncs.com/compatible-mode/v1}
+  model-name: ${LLM_MODEL:qwen-plus}
+  temperature: 0.7
+  timeout-ms: 60000
+
+embedding:
+  api-key: ${DASHSCOPE_API_KEY}
+  base-url: ${EMBEDDING_BASE_URL:https://dashscope.aliyuncs.com/compatible-mode/v1}
+  model-name: ${EMBEDDING_MODEL:text-embedding-v3}
+  dimension: ${EMBEDDING_DIMENSION:1024}
+  timeout-ms: 60000
+
+vector:
+  store: ${VECTOR_STORE:pinecone}
+  auto-index: ${VECTOR_AUTO_INDEX:false}
+  pinecone:
+    api-key: ${PINECONE_API_KEY}
+    index-host: ${PINECONE_INDEX_HOST}
+    namespace: ${PINECONE_NAMESPACE:medicalai}
+
+ocr:
+  provider: ${OCR_PROVIDER:dashscope}
+  api-key: ${DASHSCOPE_API_KEY}
+  base-url: ${OCR_BASE_URL:https://dashscope.aliyuncs.com/compatible-mode/v1}
+  model: ${OCR_MODEL:qwen-vl-plus}
+  timeout-ms: 60000
+
+storage:
+  type: ${STORAGE_TYPE:local}
+  local-dir: ${STORAGE_LOCAL_DIR:uploads}
