@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### 运行时产物 ###
+# Redis 持久化快照
+dump.rdb
